@@ -11,11 +11,11 @@ import time
 #use uma das 3 opcoes para atribuir à variável a porta usada
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411"  # Mac    (variacao de)
-serialName = "COM6"                    # Windows(variacao de)
+serialName = "COM3"                    # Windows(variacao de)
 
 def main():
     try:
-        com1 = enlace('COM3')
+        com1 = enlace(serialName)
 
         com1.enable()
 
@@ -23,21 +23,21 @@ def main():
     
         while time.time() - timei < 5:
 
-            print("esperando 1 byte de sacrifício")        
+            print("Esperando 1 byte de sacrifício")        
             rxBuffer, nRx = com1.getData(1)
             com1.rx.clearBuffer()
             time.sleep(.5)
 
-            print("COMUNICAÇÃO ABERTA COM SUCESSO\n")
+            print("Comunicação aberta com sucesso!\n")
         
-            print("RECEPÇÃO VAI COMEÇAR\n")
+            print("Iniciando recepção\n")
 
             RxLen = 0
             while RxLen == 0:
                 time.sleep(.5)
                 RxLen = com1.rx.getBufferLen()
             
-            print("Tamanho Recebido: {}".format(RxLen))
+            print("Tamanho recebido: {}".format(RxLen))
             rxBuffer, nRx = com1.getData(RxLen)
             print(rxBuffer)
             l = 0
