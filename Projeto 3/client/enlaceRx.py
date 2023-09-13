@@ -16,7 +16,7 @@ import threading
 # Class
 class RX(object):
   
-    def __init__(self, fisica):
+    def _init_(self, fisica):
         self.fisica      = fisica
         self.buffer      = bytes(bytearray())
         self.threadStop  = False
@@ -68,12 +68,12 @@ class RX(object):
         return(b)
 
     def getNData(self, size):
+        tempoI = time.time()
         while(self.getBufferLen() < size):
-            time.sleep(0.05)                 
-        return(self.getBuffer(size))
-
+            time.sleep(0.05)
+            tempoF = time.time()
+            if (tempoF - tempoI) >= 5:
+                return input("!!! TEMPO EXCEDIDO !!!\nGostaria de reiniciar a tentativa? S/N\n") 
 
     def clearBuffer(self):
         self.buffer = b""
-
-

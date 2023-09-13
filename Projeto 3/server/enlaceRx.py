@@ -72,7 +72,6 @@ class RX(object):
             time.sleep(0.05)                 
         return(self.getBuffer(size))
 
-
     def clearBuffer(self):
         self.buffer = b""
 
