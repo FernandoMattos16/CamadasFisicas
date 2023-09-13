@@ -11,7 +11,7 @@ import time
 #use uma das 3 opcoes para atribuir à variável a porta usada
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411"  # Mac    (variacao de)
-serialName = "COM5"                    # Windows(variacao de)
+serialName = "COM3"                    # Windows(variacao de)
 
 def main():
     try:
@@ -63,7 +63,7 @@ def main():
                 print(f"Inconsistência no EOP. Por favor envie o {contPacotes+1}º pacote novamente\n")
                 # Enviando código de erro
                 com1.sendData(eopErro)
-                time.sleep(1)
+                time.sleep(3)
                 # Enviando mensagem pedindo o reenvio do pacote correto
                 pacoteCerto = (contPacotes+1).to_bytes(2, byteorder="big")
                 com1.sendData(pacoteCerto)
@@ -88,7 +88,7 @@ def main():
                 contPacotes +=1
 
         pathImageRx = "Projeto 3/img/rxImage.png"
-        print(ImageRx[2:len(ImageRx)])
+        #print(ImageRx[2:len(ImageRx)])
         f = open(pathImageRx, 'wb')
         f.write(ImageRx[2:len(ImageRx)+1])
         f.close()
