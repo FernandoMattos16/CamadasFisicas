@@ -16,7 +16,7 @@ import threading
 # Class
 class RX(object):
   
-    def _init_(self, fisica):
+    def __init__(self, fisica):
         self.fisica      = fisica
         self.buffer      = bytes(bytearray())
         self.threadStop  = False
