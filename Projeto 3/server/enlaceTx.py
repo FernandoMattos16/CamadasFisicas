@@ -57,7 +57,5 @@ class TX(object):
             time.sleep(0.05)
         return(self.transLen)
         
-
     def getIsBussy(self):
         return(self.threadMutex)
-

@@ -11,7 +11,7 @@ import time
 #use uma das 3 opcoes para atribuir à variável a porta usada
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411"  # Mac    (variacao de)
-serialName = "COM3"                    # Windows(variacao de)
+serialName = "COM5"                    # Windows(variacao de)
 
 def main():
     try:
@@ -58,8 +58,6 @@ def main():
             numErro = b'1'
             # Erro de EOP = b'2'
             eopErro = b'2'
-
-            print(EOP)
 
             if EOP != b'0':
                 print(f"Inconsistência no EOP. Por favor envie o {contPacotes+1}º pacote novamente\n")
@@ -109,4 +107,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

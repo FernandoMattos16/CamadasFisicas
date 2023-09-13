@@ -74,5 +74,3 @@ class RX(object):
 
     def clearBuffer(self):
         self.buffer = b""
-
-

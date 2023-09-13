@@ -13,7 +13,7 @@ import math
 #use uma das 3 opcoes para atribuir à variável a porta usada
 #serialName = "/dev/ttyACM0"           # Ubuntu (variacao de)
 #serialName = "/dev/tty.usbmodem1411" # Mac    (variacao de)
-serialName = "COM3"                  # Windows(variacao de)
+serialName = "COM5"                  # Windows(variacao de)
 
 def main():
     try:
@@ -26,13 +26,13 @@ def main():
         # Handshake
         while True:
             # Enviando byte de sacrifício
-            print("Enviando handshake")
+            print("Enviando Handshake")
             time.sleep(.2)
             com1.sendData(b'00')
             print(". . . Aguardando retorno para inicio de transmissão . . .\n")
             rxBuffer, nRx = com1.getData(2)
             if rxBuffer == 'S' or rxBuffer == 's':
-                print("Reiniciando tentativa de transmissão\n")
+                print("\n. . . Reiniciando tentativa de transmissão . . .\n")
                 continue
             if rxBuffer == 'N' or rxBuffer == 'n':
                 print("\nTentativa de transmissão interrompida\n. . . Encerrando comunicação . . .\n")
@@ -44,7 +44,7 @@ def main():
                 print("Handshake confirmado!\n. . . Iniciando transmissão . . .\n")
                 break
          
-        pathImageTx = "Projeto 3/img/logo-insper.png"
+        pathImageTx = "Projeto 3/img/logo-insper.jpeg"
         ImageTx = open(pathImageTx, 'rb').read()
         print(ImageTx)
 

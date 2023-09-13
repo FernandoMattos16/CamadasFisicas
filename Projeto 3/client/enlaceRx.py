@@ -73,7 +73,8 @@ class RX(object):
             time.sleep(0.05)
             tempoF = time.time()
             if (tempoF - tempoI) >= 5:
-                return input("!!! TEMPO EXCEDIDO !!!\nGostaria de reiniciar a tentativa? S/N\n") 
+                return input("Servidor inativo. Deseja tentar novamente? S/N\n")
+        return(self.getBuffer(size)) 
 
     def clearBuffer(self):
         self.buffer = b""
