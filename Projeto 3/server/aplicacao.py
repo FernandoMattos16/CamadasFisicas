@@ -19,6 +19,10 @@ def main():
 
         com1.enable()
 
+        print("Comunicação aberta com sucesso!\n")
+
+        
+
         # HANDSHAKE
         print(". . . Esperando Handshake . . .\n")
         handShake, lenHS = com1.getData(2)
@@ -50,7 +54,7 @@ def main():
             # PAYLOAD
             PAYLOAD = pacote[12:tamPayload + 12]
             # EOP
-            EOP = pacote[tamPayload + 12:len(pacote)]            
+            EOP = pacote[ len(pacote)-3  :   len(pacote)]      
 
             # Sem erros = b'0'
             semErro = b'0'
@@ -58,9 +62,11 @@ def main():
             numErro = b'1'
             # Erro de EOP = b'2'
             eopErro = b'2'
+            # Erro de PayLoad = b'3'
+            payErro = b'3'
 
-            if EOP != b'0':
-                print(f"Inconsistência no EOP. Por favor envie o {contPacotes+1}º pacote novamente\n")
+            if EOP != b'000':
+                print(f"\nInconsistência no EOP. Por favor envie o {contPacotes+1}º pacote novamente\n")
                 # Enviando código de erro
                 com1.sendData(eopErro)
                 time.sleep(3)
@@ -70,7 +76,7 @@ def main():
                 time.sleep(1)
 
             elif nPacote != contPacotes+1:
-                print(f"A sequência do pacote está incorreta! Por favor envie o {contPacotes+1}º pacote novamente\n")
+                print(f"\nA sequência do pacote está incorreta! Por favor envie o {contPacotes+1}º pacote novamente\n")
                 # Enviando código de erro
                 com1.sendData(numErro)
                 time.sleep(1)
@@ -78,6 +84,13 @@ def main():
                 pacoteCerto = (contPacotes+1).to_bytes(2, byteorder="big")
                 com1.sendData(pacoteCerto)
                 time.sleep(1)
+            
+            elif  tamPayload != len(PAYLOAD):
+                print(f"\nInconsistência no tamanho do Payload!\n. . . Encerrando comunicação . . .\n")
+                # Erro no tamanho do Payload
+                com1.sendData(payErro)
+                time.sleep(.5)
+                break
                 
             else:
                 # Recebendo PAYLOAD
@@ -93,7 +106,7 @@ def main():
         f.write(ImageRx[2:len(ImageRx)+1])
         f.close()
 
-        print("-------------------------")
+        print("\n-------------------------")
         print("Comunicação encerrada")
         print("-------------------------")
         com1.disable()

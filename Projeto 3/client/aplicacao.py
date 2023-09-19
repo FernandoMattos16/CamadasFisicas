@@ -46,7 +46,7 @@ def main():
          
         pathImageTx = "Projeto 3/img/logo-insper.jpeg"
         ImageTx = open(pathImageTx, 'rb').read()
-        print(ImageTx)
+        # print(ImageTx)
 
         lenImage = len(ImageTx)
         nPacotes = math.ceil(lenImage/50)
@@ -64,11 +64,11 @@ def main():
             # HEAD
             nPacote = (contPacotes+1).to_bytes(6, byteorder="big") # Número do pacote
             tamPayload = (len(payloads[contPacotes])).to_bytes(6, byteorder="big") # Tamanho do pacote
-            HEAD = nPacote + tamPayload
+            HEAD = nPacote + tamPayload 
             # PAYLOAD
             PAYLOAD = payloads[contPacotes] # Pacote
             # EOP
-            EOP = b'0'
+            EOP = b'000'
             
             tamanhoPacote = (len(HEAD + PAYLOAD + EOP)).to_bytes(2,byteorder="big")
             com1.sendData(tamanhoPacote)
@@ -82,17 +82,21 @@ def main():
             if confirmacao == b'2':
                 pacoteCerto, pacoteCertoLen = com1.getData(2)
                 contPacotes = int.from_bytes(pacoteCerto, "big") - 1
-                print(f"Inconsistência no EOP! Reenviando {contPacotes+1}º pacote\n")
+                print(f"\nInconsistência no EOP! Reenviando o {contPacotes+1}º pacote\n")
 
             elif confirmacao == b'1':
                 pacoteCerto, pacoteCertoLen = com1.getData(2)
                 contPacotes = int.from_bytes(pacoteCerto, "big") - 1
-                print(f"A sequência do pacote está incorreta! Reenviando {contPacotes+1}º pacote\n")
+                print(f"\nA sequência do pacote está incorreta! Reenviando o {contPacotes+1}º pacote\n")
+
+            elif confirmacao == b'3':
+                print(f"\nInconsistência no tamanho do Payload!\n. . . Encerrando comunicação . . .\n")
+                break
 
             else:
                 contPacotes += 1
         
-        print("-------------------------")
+        print("\n-------------------------")
         print("Comunicação encerrada")
         print("-------------------------")
         com1.disable()
