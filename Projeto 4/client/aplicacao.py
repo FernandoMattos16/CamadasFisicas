@@ -27,7 +27,7 @@ serialName = "COM5"                  # Windows(variacao de)
 
 def main():
     try:
-        path = "Projeto 4/assets/img/logo-insper.jpeg"  
+        path = "Projeto 4/client/assets/img/logo-insper.jpeg"  
         file = open(path, 'rb').read()
         logs = ''
 
@@ -42,8 +42,8 @@ def main():
         print("Iniciando HandShake\n")
         timeMax = time.time()
         while True:
-            payload, h1, h2, h3, h4, h5, h6, h7, h8, h9 = b'\x00'
-            h0 = 0
+            payload, h1, h2, h3, h4, h5, h6, h7, h8, h9 = b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00'
+            h0 = (1).to_bytes(1, byteorder="big")
             head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
             eop = 0x00000000.to_bytes(4, byteorder="big")
             pacote = head + payload + eop
@@ -78,8 +78,8 @@ def main():
         cont = 0
         while cont < int.from_bytes(h3, "big"):
             print(f"Enviando informações do pacote {h4}")
-            h4 = (h4).to_bytes(1, byteorder="big")
             h7 = (h4-1).to_bytes(1, byteorder="big")
+            h4 = (h4).to_bytes(1, byteorder="big")
             h0 = (3).to_bytes(1, byteorder="big")
             h5 = len(payloads[int.from_bytes(h4,"big")-1])
             h5 = (h5).to_bytes(1, byteorder="big")
@@ -106,6 +106,9 @@ def main():
                     print("Handshake confirmado!\n. . . Iniciando transmissão . . .\n")
                     break
 
+            numPacoteCorreto = None
+            h4 = int.from_bytes(h4, "big")
+
             if confirmacao[0] == 4:
                 logs += createLog(confirmacao, 'recebimento')
                 print(confirmacao[7])
@@ -126,7 +129,7 @@ def main():
                 h4 = numPacoteCorreto
                 cont = numPacoteCorreto - 1
 
-        with open(f'Projeto 4/assets/log/log.txt', 'w') as f:
+        with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
             f.write(logs)
         # * FECHANDO CLIENT
         print("-------------------------")

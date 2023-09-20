@@ -39,6 +39,8 @@ def main():
 
         pacote, lenPacote = com1.getData(15)
 
+        print(pacote)
+
         logs += createLog(pacote, 'recebimento')
 
         pacote = list(pacote)
@@ -48,6 +50,8 @@ def main():
         for i in pacote:
             i = (i).to_bytes(1, byteorder="big")
             responseHandShake += i
+
+        pacote = responseHandShake
 
         print(". . . Handshake recebido com sucesso . . . Enviando reposta de estabilidade.")
 
@@ -61,8 +65,11 @@ def main():
             print(f". . . Recebendo o {numPacote}º pacote . . .\n")
             #HEAD
             head, lenHead = com1.getDataServer(10)
+            print(head)
             lenPayload = head[5]
             payload_EOP, lenPayload_EOP = com1.getDataServer(lenPayload + 4)
+
+            pacote = head + payload_EOP
 
             logs += createLog(pacote, 'recebimento')
             head = pacote[0:10]
@@ -79,6 +86,9 @@ def main():
 
             numPacoteRecebido = h4
 
+            print(numPacote)
+
+
             # Checando se o número do pacote enviado está correto
             if h4 != numPacote:
                 print(f"O número do pacote está errado! Por favor reenvie o pacote {numPacote}")
@@ -91,7 +101,7 @@ def main():
                     responseCorrectMsg += i
                 com1.sendData(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"))
                 time.sleep(.5)
-                break
+                
 
             # Checando se o EOP está no local correto
             eop = pacote[len(pacote)-4:len(pacote)+1]
@@ -112,7 +122,6 @@ def main():
             logs += createLog(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"), 'envio')
             time.sleep(.5)
             
-            numPacote = h4
         
             if numPacote == numPacoteRecebido:
                 numPacote += 1
@@ -123,12 +132,12 @@ def main():
                     break
 
 
-        pathImageRx = "Projeto 4/assets/img/rxImage.png"
+        pathImageRx = "Projeto 4/server/assets/img/rxImage.png"
         f = open(pathImageRx, 'wb')
         f.write(data)
         f.close()
 
-        with open(f"Projeto 4/assets/log/log.txt", 'w') as f:
+        with open(f"Projeto 4/server/assets/log/log.txt", 'w') as f:
             f.write(logs)
         # * FECHANDO CLIENT
         print("-------------------------")
