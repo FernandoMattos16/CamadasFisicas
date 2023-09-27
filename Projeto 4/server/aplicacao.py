@@ -56,6 +56,7 @@ def main():
 
         print("Handshake recebido com sucesso!\n. . . Enviando reposta de estabilidade . . .\n")
 
+        logs += createLog(pacote, 'envio')
         com1.sendData(pacote)
         time.sleep(.5)
 
@@ -79,6 +80,8 @@ def main():
                 logs += createLog(pacote, 'envio')
                 com1.sendData(pacote)
                 print("Pacote não recebido após 20 segundos!\n. . . Cancelando comunicação . . .\n")
+                with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                    f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
             else:
@@ -112,6 +115,8 @@ def main():
                 if h0 == 5:
                     logs += createLog(pacote, 'recebimento')
                     print("Time-out de client registrado!\n. . . Cancelando comunicação . . .\n")
+                    with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                        f.write(logs)
                     com1.disable()
                     sys.exit("Comunicação encerrada")
 

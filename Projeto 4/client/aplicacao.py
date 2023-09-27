@@ -39,24 +39,33 @@ def main():
         timeMax = time.time()
         while True:
             print("Enviando Handshake")
-            payload, h1, h2, h3, h4, h5, h6, h7, h8, h9 = b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00'
-            h0 = (1).to_bytes(1, byteorder="big")
-            head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
-            eop = 0x00000000.to_bytes(4, byteorder="big")
-            pacote = head + payload + eop
-            com1.sendData(pacote)
-            (". . . Aguardando retorno para inicio de transmissão . . .\n")
-            logs += createLog(pacote, 'envio')
-            time.sleep(.5)
-            confirmacao, lenConfimacao = com1.getData(15)
             timeF = time.time()
             if timeF - timeMax >= 25 or type(confirmacao) == None:
                 print("Servidor não respondeu após quarta tentativa.\n. . . Cancelando comunicação . . .\n")
+                payload, h1, h2, h3, h4, h5, h6, h7, h8, h9 = b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00'
+                h0 = (1).to_bytes(1, byteorder="big")
+                head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
+                eop = 0x00000000.to_bytes(4, byteorder="big")
+                pacote = head + payload + eop
+                com1.sendData(pacote)
+                (". . . Aguardando retorno para inicio de transmissão . . .\n")
+                logs += createLog(pacote, 'envio')
+                with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                    f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
-            elif type(confirmacao) == str:
-                print(confirmacao)
             else:
+                payload, h1, h2, h3, h4, h5, h6, h7, h8, h9 = b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00'
+                h0 = (1).to_bytes(1, byteorder="big")
+                head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
+                eop = 0x00000000.to_bytes(4, byteorder="big")
+                pacote = head + payload + eop
+                com1.sendData(pacote)
+                (". . . Aguardando retorno para inicio de transmissão . . .\n")
+                logs += createLog(pacote, 'envio')
+                time.sleep(.5)
+                confirmacao, lenConfimacao = com1.getData(15)
+                logs += createLog(confirmacao, 'recebimento')
                 print("Handshake confirmado!\n. . . Iniciando transmissão . . .\n")
                 break
                 
@@ -91,9 +100,11 @@ def main():
                     h0 = (5).to_bytes(1, byteorder="big")
                     head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
                     pacote = head + payloads[int.from_bytes(h4, "big") - 1] + eop
-                    logs += createLog(confirmacao, 'envio')
+                    logs += createLog(pacote, 'envio')
                     com1.sendData(pacote)
                     print("Servidor não respondeu após quarta tentativa!\n. . . Cancelando comunicação . . .")
+                    with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                        f.write(logs)
                     com1.disable()
                     sys.exit("Comunicação encerrada")
                 else:
@@ -114,6 +125,8 @@ def main():
             elif confirmacao[0] == 5:
                 logs += createLog(confirmacao, 'recebimento')
                 print("Time-out de servidor registrado!\n. . . Cancelando comunicação . . .\n")
+                with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                    f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
             else:
