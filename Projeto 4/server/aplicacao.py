@@ -2,6 +2,7 @@ from enlace import *
 import time
 from datetime import datetime
 from datetime import datetime
+import sys
 
 
 
@@ -37,7 +38,7 @@ def main():
         # HANDSHAKE
         print(". . . Esperando Handshake . . .\n")
 
-        pacote, lenPacote = com1.getData(15)
+        pacote, lenPacote = com1.getDataHandshake(15)
 
         print(pacote)
 
@@ -53,46 +54,90 @@ def main():
 
         pacote = responseHandShake
 
-        print(". . . Handshake recebido com sucesso . . . Enviando reposta de estabilidade.")
+        print("Handshake recebido com sucesso!\n. . . Enviando reposta de estabilidade . . .\n")
 
         com1.sendData(pacote)
         time.sleep(.5)
 
+        print("Agora vamos realizar o início do envio dos pacotes\n")
+
         # Recebendo Pacotes
         data = b''
         numPacote = 1
+        timeMax = time.time()
         while True:
-            print(f". . . Recebendo o {numPacote}º pacote . . .\n")
-            #HEAD
-            head, lenHead = com1.getDataServer(10)
-            print(head)
-            lenPayload = head[5]
-            payload_EOP, lenPayload_EOP = com1.getDataServer(lenPayload + 4)
+            timeF = time.time()
+            if timeF - timeMax >= 20:
+                pacote = list(pacote)
+                pacote = list(map(int, pacote))
+                pacote[0] = 5
+                responseHandShake = b''
+                for i in pacote:
+                    i = (i).to_bytes(1, byteorder="big")
+                    responseHandShake += i
+                pacote = responseHandShake
+                logs += createLog(pacote, 'envio')
+                com1.sendData(pacote)
+                print("Pacote não recebido após 20 segundos!\n. . . Cancelando comunicação . . .\n")
+                com1.disable()
+                sys.exit("Comunicação encerrada")
+            else:
+                print(f". . . Recebendo o {numPacote}º pacote . . .\n")
+                #HEAD
+                head, lenHead = com1.getDataServer(10)
+                print(head)
+                lenPayload = head[5]
+                payload_EOP, lenPayload_EOP = com1.getDataServer(lenPayload + 4)
+                
 
-            pacote = head + payload_EOP
+                pacote = head + payload_EOP
 
-            logs += createLog(pacote, 'recebimento')
-            head = pacote[0:10]
-            h0 = head[0] # tipo de mensagem
-            h1 = head[1] # livre
-            h2 = head[2] # livre
-            h3 = head[3] # número total de pacotes do arquivo
-            h4 = head[4] # número do pacote sendo enviado
-            h5 = head[5] # se tipo for handshake:id do arquivo; se tipo for dados: tamanho do payload
-            h6 = head[6] # pacote solicitado para recomeço quando a erro no envio.
-            h7 = head[7] # último pacote recebido com sucesso.
-            h8 = head[8] # CRC
-            h9 = head[9] # CRC
+                logs += createLog(pacote, 'recebimento')
+                head = pacote[0:10]
+                h0 = head[0] # tipo de mensagem
+                h1 = head[1] # livre
+                h2 = head[2] # livre
+                h3 = head[3] # número total de pacotes do arquivo
+                h4 = head[4] # número do pacote sendo enviado
+                h5 = head[5] # se tipo for handshake:id do arquivo; se tipo for dados: tamanho do payload
+                h6 = head[6] # pacote solicitado para recomeço quando a erro no envio.
+                h7 = head[7] # último pacote recebido com sucesso.
+                h8 = head[8] # CRC
+                h9 = head[9] # CRC
 
-            numPacoteRecebido = h4
+                numPacoteRecebido = h4
 
-            print(numPacote)
+                print(numPacote)
 
+                if h0 == 5:
+                    logs += createLog(pacote, 'recebimento')
+                    print("Time-out de client registrado!\n. . . Cancelando comunicação . . .\n")
+                    com1.disable()
+                    sys.exit("Comunicação encerrada")
 
-            # Checando se o número do pacote enviado está correto
-            if h4 != numPacote:
-                print(f"O número do pacote está errado! Por favor reenvie o pacote {numPacote}")
-                h0 = 6
+                # Checando se o número do pacote enviado está correto
+                if h4 != numPacote:
+                    print(f"O número do pacote está errado! Por favor reenvie o pacote {numPacote}")
+                    h0 = 6
+                    h7 = numPacote
+                    confirmacao = [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9]
+                    responseCorrectMsg = b''
+                    for i in confirmacao:
+                        i = (i).to_bytes(1, byteorder="big")
+                        responseCorrectMsg += i
+                    com1.sendData(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"))
+                    time.sleep(.5)
+                    
+
+                # Checando se o EOP está no local correto
+                eop = pacote[len(pacote)-4:len(pacote)+1]
+                if eop != 0x00000000.to_bytes(4, byteorder="big"):
+                    print(f"O eop está no local errado! Por favor reenvie o pacote {numPacote}")
+                    break
+                
+            
+                print("Está tudo certo com a mensagem! Vamos enviar uma mensagem de confirmação.")
+                h0 = 4
                 h7 = numPacote
                 confirmacao = [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9]
                 responseCorrectMsg = b''
@@ -100,36 +145,17 @@ def main():
                     i = (i).to_bytes(1, byteorder="big")
                     responseCorrectMsg += i
                 com1.sendData(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"))
+                logs += createLog(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"), 'envio')
                 time.sleep(.5)
                 
-
-            # Checando se o EOP está no local correto
-            eop = pacote[len(pacote)-4:len(pacote)+1]
-            if eop != 0x00000000.to_bytes(4, byteorder="big"):
-                print(f"O eop está no local errado! Por favor reenvie o pacote {numPacote}")
-                break
             
-        
-            print("Está tudo certo com a mensagem! Vamos enviar uma mensagem de confirmação.")
-            h0 = 4
-            h7 = numPacote
-            confirmacao = [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9]
-            responseCorrectMsg = b''
-            for i in confirmacao:
-                i = (i).to_bytes(1, byteorder="big")
-                responseCorrectMsg += i
-            com1.sendData(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"))
-            logs += createLog(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"), 'envio')
-            time.sleep(.5)
-            
-        
-            if numPacote == numPacoteRecebido:
-                numPacote += 1
-                data += payload_EOP[0:len(payload_EOP) - 4]                
+                if numPacote == numPacoteRecebido:
+                    numPacote += 1
+                    data += payload_EOP[0:len(payload_EOP) - 4]                
 
-                if numPacote == h3 + 1:
-                    data += payload_EOP[0:len(payload_EOP) - 4]
-                    break
+                    if numPacote == h3 + 1:
+                        data += payload_EOP[0:len(payload_EOP) - 4]
+                        break
 
 
         pathImageRx = "Projeto 4/server/assets/img/rxImage.png"

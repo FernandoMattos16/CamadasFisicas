@@ -42,6 +42,10 @@ class enlace(object):
     def getData(self, size):
         data = self.rx.getNData(size)
         return(data, len(data))
+    
+    def getDataHandshake(self, size):
+        data = self.rx.getNDataHandshake(size)
+        return(data, len(data))
 
     def getDataServer(self, size):
         data = self.rx.getNDataServer(size)

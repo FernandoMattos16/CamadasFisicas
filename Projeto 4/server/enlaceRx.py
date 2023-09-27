@@ -72,9 +72,14 @@ class RX(object):
         while(self.getBufferLen() < size):
             time.sleep(0.05)
             tempoF = time.time()
-            if (tempoF - tempoI) >= 5:
+            if (tempoF - tempoI) >= 20:
                 return "Servidor inativo! Vamos tentar reenviar o pacote.\n"
 
+        return(self.getBuffer(size))
+    
+    def getNDataHandshake(self, size):
+        while(self.getBufferLen() < size):
+            time.sleep(0.05)                 
         return(self.getBuffer(size))
 
     def getNDataServer(self, size):

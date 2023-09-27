@@ -50,16 +50,12 @@ def main():
             time.sleep(.5)
             confirmacao, lenConfimacao = com1.getData(15)
             timeF = time.time()
-            if timeF - timeMax >= 25:
+            if timeF - timeMax >= 25 or type(confirmacao) == None:
                 print("Servidor não respondeu após quarta tentativa.\n. . . Cancelando comunicação . . .\n")
                 com1.disable()
                 sys.exit("Comunicação encerrada")
             elif type(confirmacao) == str:
                 print(confirmacao)
-            elif type(confirmacao) == None:
-                print("Servidor não respondeu após quarta tentativa.\n. . . Cancelando comunicação . . .\n")
-                com1.disable()
-                sys.exit("Comunicação encerrada")
             else:
                 print("Handshake confirmado!\n. . . Iniciando transmissão . . .\n")
                 break
@@ -80,7 +76,7 @@ def main():
         # último pacote enviado com sucesso
         cont = 0
         while cont < int.from_bytes(h3, "big"):
-            print(f"Enviando informações do pacote {h4}")
+            print(f". . . Enviando informações do pacote {h4} . . .\n")
             h7 = (h4-1).to_bytes(1, byteorder="big")
             h4 = (h4).to_bytes(1, byteorder="big")
             h0 = (3).to_bytes(1, byteorder="big")
@@ -88,25 +84,24 @@ def main():
             h5 = (h5).to_bytes(1, byteorder="big")
             head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
             pacote = head + payloads[int.from_bytes(h4, "big") - 1] + eop
-            
             timeMax = time.time()
             while True:
-                com1.sendData(pacote)
-                logs += createLog(pacote, 'envio')
-                time.sleep(.5)
-                confirmacao, lenConfimacao = com1.getData(15)
                 timeF = time.time()
-                if timeF - timeMax >= 25:
-                    print("Servidor não respondeu após quarta tentativa. Cancelando comunicação.")
-                    com1.disable()
-                    sys.exit("Comunicação encerrada")
-                elif type(confirmacao) == str:
-                    print(confirmacao)
-                elif type(confirmacao) == None:
+                if timeF - timeMax >= 20:
+                    h0 = (5).to_bytes(1, byteorder="big")
+                    head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
+                    pacote = head + payloads[int.from_bytes(h4, "big") - 1] + eop
+                    logs += createLog(confirmacao, 'envio')
+                    com1.sendData(pacote)
+                    print("Servidor não respondeu após quarta tentativa!\n. . . Cancelando comunicação . . .")
                     com1.disable()
                     sys.exit("Comunicação encerrada")
                 else:
-                    print("Handshake confirmado!\n. . . Iniciando transmissão . . .\n")
+                    com1.sendData(pacote)
+                    logs += createLog(pacote, 'envio')
+                    time.sleep(.5)
+                    confirmacao, lenConfimacao = com1.getData(15)
+                    print("Pacote enviado com sucesso!\n. . . Aguardando resposta de recebimento . . .\n")
                     break
 
             numPacoteCorreto = None
@@ -115,11 +110,16 @@ def main():
             if confirmacao[0] == 4:
                 logs += createLog(confirmacao, 'recebimento')
                 print(confirmacao[7])
-                print("Tudo certo! O servidor recebeu o pacote corretamente.")
+                print("Pacote recebido com sucesso!\n")
+            elif confirmacao[0] == 5:
+                logs += createLog(confirmacao, 'recebimento')
+                print("Time-out de servidor registrado!\n. . . Cancelando comunicação . . .\n")
+                com1.disable()
+                sys.exit("Comunicação encerrada")
             else:
                 logs += createLog(confirmacao, 'recebimento')
                 numPacoteCorreto = confirmacao[7]
-                print(f"Uhmm, algo deu errado no envio :( Precisamos reenviar o pacote {numPacoteCorreto}")
+                print(f"Erro no envio :(\n . . . Reenviando o {numPacoteCorreto}º pacote . . .\n")
             
             if numPacoteCorreto is None:
                 if h4 == 2:
