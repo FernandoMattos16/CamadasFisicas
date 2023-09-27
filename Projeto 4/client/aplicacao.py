@@ -27,38 +27,37 @@ serialName = "COM5"                  # Windows(variacao de)
 
 def main():
     try:
-        path = "Projeto 4/client/assets/img/logo-insper.jpeg"  
-        file = open(path, 'rb').read()
         logs = ''
 
         # * INICIALIZANDO CLIENT
         com1 = enlace(serialName)
-    
         com1.enable()
 
         print("Comunicação aberta com sucesso!\n")
 
         # * HANDSHAKE
-        print("Iniciando HandShake\n")
         timeMax = time.time()
         while True:
+            print("Enviando Handshake")
             payload, h1, h2, h3, h4, h5, h6, h7, h8, h9 = b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00'
             h0 = (1).to_bytes(1, byteorder="big")
             head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
             eop = 0x00000000.to_bytes(4, byteorder="big")
             pacote = head + payload + eop
             com1.sendData(pacote)
+            (". . . Aguardando retorno para inicio de transmissão . . .\n")
             logs += createLog(pacote, 'envio')
             time.sleep(.5)
             confirmacao, lenConfimacao = com1.getData(15)
             timeF = time.time()
             if timeF - timeMax >= 25:
-                print("Servidor não respondeu após quarta tentativa. Cancelando comunicação.")
+                print("Servidor não respondeu após quarta tentativa.\n. . . Cancelando comunicação . . .\n")
                 com1.disable()
                 sys.exit("Comunicação encerrada")
             elif type(confirmacao) == str:
                 print(confirmacao)
             elif type(confirmacao) == None:
+                print("Servidor não respondeu após quarta tentativa.\n. . . Cancelando comunicação . . .\n")
                 com1.disable()
                 sys.exit("Comunicação encerrada")
             else:
@@ -67,7 +66,11 @@ def main():
                 
         # * ENVIO DOS PACOTES
         print("Agora vamos realizar o início do envio dos pacotes\n")
+
+        path = "Projeto 4/client/assets/img/logo-insper.jpeg"  
+        file = open(path, 'rb').read()
         payloads = [file[i:i + 114] for i in range(0, len(file), 114)]
+        
         # h3 = quantidade total de pacotes
         lenImage = len(file)
         h3 = math.ceil(lenImage/114)
@@ -131,6 +134,7 @@ def main():
 
         with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
             f.write(logs)
+
         # * FECHANDO CLIENT
         print("-------------------------")
         print("Comunicação encerrada")
