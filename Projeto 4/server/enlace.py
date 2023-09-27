@@ -50,3 +50,7 @@ class enlace(object):
     def getDataServer(self, size):
         data = self.rx.getNDataServer(size)
         return(data, len(data))
+
+    def clearBuffer(self):
+        self.rx.buffer = b""
+        self.tx.buffer = b""

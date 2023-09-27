@@ -40,7 +40,7 @@ def main():
         while True:
             print("Enviando Handshake")
             timeF = time.time()
-            if timeF - timeMax >= 25 or type(confirmacao) == None:
+            if timeF - timeMax >= 25:
                 print("Servidor não respondeu após quarta tentativa.\n. . . Cancelando comunicação . . .\n")
                 payload, h1, h2, h3, h4, h5, h6, h7, h8, h9 = b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00',b'\x00'
                 h0 = (1).to_bytes(1, byteorder="big")
@@ -64,13 +64,15 @@ def main():
                 (". . . Aguardando retorno para inicio de transmissão . . .\n")
                 logs += createLog(pacote, 'envio')
                 time.sleep(.5)
-                confirmacao, lenConfimacao = com1.getData(15)
+                confirmacao, lenConfimacao = com1.getDataHandshake(15)
                 logs += createLog(confirmacao, 'recebimento')
                 print("Handshake confirmado!\n. . . Iniciando transmissão . . .\n")
                 break
                 
         # * ENVIO DOS PACOTES
         print("Agora vamos realizar o início do envio dos pacotes\n")
+
+        #time.sleep(25)
 
         path = "Projeto 4/client/assets/img/logo-insper.jpeg"  
         file = open(path, 'rb').read()
@@ -84,6 +86,7 @@ def main():
         h4 = 1
         # último pacote enviado com sucesso
         cont = 0
+        timeMax = time.time()
         while cont < int.from_bytes(h3, "big"):
             print(f". . . Enviando informações do pacote {h4} . . .\n")
             h7 = (h4-1).to_bytes(1, byteorder="big")
@@ -93,16 +96,15 @@ def main():
             h5 = (h5).to_bytes(1, byteorder="big")
             head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
             pacote = head + payloads[int.from_bytes(h4, "big") - 1] + eop
-            timeMax = time.time()
+            timeF = time.time()
             while True:
-                timeF = time.time()
                 if timeF - timeMax >= 20:
                     h0 = (5).to_bytes(1, byteorder="big")
                     head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
                     pacote = head + payloads[int.from_bytes(h4, "big") - 1] + eop
                     logs += createLog(pacote, 'envio')
                     com1.sendData(pacote)
-                    print("Servidor não respondeu após quarta tentativa!\n. . . Cancelando comunicação . . .")
+                    print("Nenhuma resposta do servidor após 20 segundos!\n. . . Cancelando comunicação . . .")
                     with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
                         f.write(logs)
                     com1.disable()
@@ -116,34 +118,51 @@ def main():
                     break
 
             numPacoteCorreto = None
-            h4 = int.from_bytes(h4, "big")
-
-            if confirmacao[0] == 4:
-                logs += createLog(confirmacao, 'recebimento')
-                print(confirmacao[7])
-                print("Pacote recebido com sucesso!\n")
-            elif confirmacao[0] == 5:
-                logs += createLog(confirmacao, 'recebimento')
-                print("Time-out de servidor registrado!\n. . . Cancelando comunicação . . .\n")
+            
+            if confirmacao == "Servidor inativo! Vamos tentar reenviar o pacote.\n":
+                h0 = (5).to_bytes(1, byteorder="big")
+                head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
+                pacote = head + payloads[int.from_bytes(h4, "big") - 1] + eop
+                logs += createLog(pacote, 'envio')
+                com1.sendData(pacote)
+                print(pacote)
+                print("Nenhuma resposta do servidor após 20 segundos!\n. . . Cancelando comunicação . . .")
                 with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
                     f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
-            else:
+            elif confirmacao[0] < 4:
+                h4 = int.from_bytes(h4, "big")
                 logs += createLog(confirmacao, 'recebimento')
-                numPacoteCorreto = confirmacao[7]
+                numPacoteCorreto = h4
                 print(f"Erro no envio :(\n . . . Reenviando o {numPacoteCorreto}º pacote . . .\n")
-            
-            if numPacoteCorreto is None:
-                if h4 == 2:
-                    h4 += 2
-                    cont +=1
-                else:
-                    h4 += 1
-                    cont += 1
             else:
-                h4 = numPacoteCorreto
-                cont = numPacoteCorreto - 1
+                h4 = int.from_bytes(h4, "big")
+                if confirmacao[0] == 4:
+                    logs += createLog(confirmacao, 'recebimento')
+                    print(confirmacao[7])
+                    print("Pacote recebido com sucesso!\n")
+                elif confirmacao[0] == 5:
+                    logs += createLog(confirmacao, 'recebimento')
+                    print("Time-out de servidor registrado!\n. . . Cancelando comunicação . . .\n")
+                    with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                        f.write(logs)
+                    com1.disable()
+                    sys.exit("Comunicação encerrada")
+                else:
+                    logs += createLog(confirmacao, 'recebimento')
+                    numPacoteCorreto = confirmacao[7]
+                    print(f"Erro no envio :(\n . . . Reenviando o {numPacoteCorreto}º pacote . . .\n")
+                
+                if numPacoteCorreto is None:
+                    if h4 == 2:
+                        h4 += 2
+                    else:
+                        h4 += 1
+                    cont += 1
+                else:
+                    h4 = numPacoteCorreto
+                    cont = numPacoteCorreto - 1
 
         with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
             f.write(logs)

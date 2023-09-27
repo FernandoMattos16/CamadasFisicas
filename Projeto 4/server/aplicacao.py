@@ -54,14 +54,16 @@ def main():
 
         pacote = responseHandShake
 
-        print("Handshake recebido com sucesso!\n. . . Enviando reposta de estabilidade . . .\n")
+        print("Handshake recebido com sucesso!\n")
 
         logs += createLog(pacote, 'envio')
         com1.sendData(pacote)
         time.sleep(.5)
+        com1.clearBuffer()
 
-        print("Agora vamos realizar o início do envio dos pacotes\n")
+        print("Iniciando envio dos pacotes\n")
 
+        #time.sleep(23)
         # Recebendo Pacotes
         data = b''
         numPacote = 1
@@ -79,7 +81,7 @@ def main():
                 pacote = responseHandShake
                 logs += createLog(pacote, 'envio')
                 com1.sendData(pacote)
-                print("Pacote não recebido após 20 segundos!\n. . . Cancelando comunicação . . .\n")
+                print("\nPacote não recebido após 20 segundos!\n. . . Cancelando comunicação . . .\n")
                 with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
                     f.write(logs)
                 com1.disable()
@@ -88,10 +90,11 @@ def main():
                 print(f". . . Recebendo o {numPacote}º pacote . . .\n")
                 #HEAD
                 head, lenHead = com1.getDataServer(10)
+
                 print(head)
                 lenPayload = head[5]
                 payload_EOP, lenPayload_EOP = com1.getDataServer(lenPayload + 4)
-                
+
 
                 pacote = head + payload_EOP
 
@@ -111,6 +114,9 @@ def main():
                 numPacoteRecebido = h4
 
                 print(numPacote)
+                print(h0)
+                print(pacote)
+                print()
 
                 if h0 == 5:
                     logs += createLog(pacote, 'recebimento')
@@ -177,6 +183,7 @@ def main():
         com1.disable()
         exit()
         
+        
     except Exception as erro:
         print("ops! :-\\")
         print(erro)
@@ -190,5 +197,3 @@ def main():
     #so roda o main quando for executado do terminal ... se for chamado dentro de outro modulo nao roda
 if __name__ == "__main__":
     main()
-
-        

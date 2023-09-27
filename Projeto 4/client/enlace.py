@@ -39,6 +39,10 @@ class enlace(object):
     def sendData(self, data):
         self.tx.sendBuffer(data)
         
+    def getDataHandshake(self, size):
+        data = self.rx.getNDataHandshake(size)
+        return(data, len(data))
+    
     def getData(self, size):
         data = self.rx.getNData(size)
         return(data, len(data))
