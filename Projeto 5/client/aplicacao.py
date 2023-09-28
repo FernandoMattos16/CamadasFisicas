@@ -108,7 +108,7 @@ def main():
             crc1, crc2 = Crc16.calc(data).to_bytes(2,byteorder='big')
             h8 = crc1.to_bytes(1,byteorder='big')
             h9 = crc2.to_bytes(1,byteorder='big')
-                        
+
             head = h0 + h1 + h2 + h3 + h4 + h5 + h6 + h7 + h8 + h9
             pacote = head + payloads[int.from_bytes(h4, "big") - 1] + eop
 

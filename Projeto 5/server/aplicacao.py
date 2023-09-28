@@ -7,6 +7,7 @@ from crccheck.crc import Crc16
 
 
 
+
 def createLog(data, tipo):
     tempo = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     tipoMsg = data[0]
@@ -109,6 +110,12 @@ def main():
 
                 numPacoteRecebido = h4
 
+                eop = pacote[len(pacote)-4:len(pacote)+1]
+
+                crc1, crc2 = Crc16.calc(pacote[10:len(pacote) - 4]).to_bytes(2,byteorder='big')
+                crc_h8 = crc1.to_bytes(1,byteorder='big')
+                crc_h9 = crc2.to_bytes(1,byteorder='big')
+
                 if h0 == 5:
                     #logs += createLog(pacote, 'recebimento')
                     print("Time-out de client registrado!\n. . . Cancelando comunicação . . .\n")
@@ -118,7 +125,7 @@ def main():
                     sys.exit("Comunicação encerrada")
 
                 # Checando se o número do pacote enviado está correto
-                if h4 != numPacote:
+                elif h4 != numPacote:
                     print(f"O número do pacote está errado! Por favor reenvie o pacote {numPacote}")
                     h0 = 6
                     h7 = numPacote
@@ -133,31 +140,29 @@ def main():
                     
 
                 # Checando se o EOP está no local correto
-                eop = pacote[len(pacote)-4:len(pacote)+1]
-                if eop != 0x00000000.to_bytes(4, byteorder="big"):
+                
+                elif eop != 0x00000000.to_bytes(4, byteorder="big"):
                     print(f"O eop está no local errado! Por favor reenvie o pacote {numPacote}")
                     break
 
                 # Checando se o CRC está correto
-                crc1, crc2 = Crc16.calc(pacote[10:len(pacote) - 4]).to_bytes(2,byteorder='big')
-                crc_h8 = crc1.to_bytes(1,byteorder='big')
-                crc_h9 = crc2.to_bytes(1,byteorder='big')
-                if (h8.to_bytes(1, byteorder="big") != crc_h8) or (h9.to_bytes(1, byteorder="big") != crc_h9):
+              
+                elif (h8.to_bytes(1, byteorder="big") != crc_h8) or (h9.to_bytes(1, byteorder="big") != crc_h9):
                     print(f"O CRC está errado! Por favor reenvie o pacote {numPacote}")
-                
 
+                else:
                 
-                print("Está tudo certo com a mensagem! Vamos enviar uma mensagem de confirmação.")
-                h0 = 4
-                h7 = numPacote
-                confirmacao = [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9]
-                responseCorrectMsg = b''
-                for i in confirmacao:
-                    i = (i).to_bytes(1, byteorder="big")
-                    responseCorrectMsg += i
-                com1.sendData(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"))
-                logs += createLog(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"), 'envio')
-                time.sleep(.5)
+                    print("Está tudo certo com a mensagem! Vamos enviar uma mensagem de confirmação.")
+                    h0 = 4
+                    h7 = numPacote
+                    confirmacao = [h0, h1, h2, h3, h4, h5, h6, h7, h8, h9]
+                    responseCorrectMsg = b''
+                    for i in confirmacao:
+                        i = (i).to_bytes(1, byteorder="big")
+                        responseCorrectMsg += i
+                    com1.sendData(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"))
+                    logs += createLog(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"), 'envio')
+                    time.sleep(.5)
                 
                 if numPacote == numPacoteRecebido:
                     numPacote += 1
