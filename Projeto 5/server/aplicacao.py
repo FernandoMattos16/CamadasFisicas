@@ -3,6 +3,7 @@ import time
 from datetime import datetime
 from datetime import datetime
 import sys
+from crccheck.crc import Crc16
 
 
 
@@ -39,6 +40,7 @@ def main():
         print(". . . Esperando Handshake . . .\n")
 
         pacote, lenPacote = com1.getDataHandshake(15)
+        time.sleep(.5)
 
         logs += createLog(pacote, 'recebimento')
 
@@ -80,7 +82,7 @@ def main():
                 logs += createLog(pacote, 'envio')
                 com1.sendData(pacote)
                 print("\nPacote não recebido após 20 segundos!\n. . . Cancelando comunicação . . .\n")
-                with open(f'Projeto 4/server/assets/log/log.txt', 'w') as f:
+                with open(f'Projeto 5/server/assets/log/log.txt', 'w') as f:
                     f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
@@ -110,7 +112,7 @@ def main():
                 if h0 == 5:
                     #logs += createLog(pacote, 'recebimento')
                     print("Time-out de client registrado!\n. . . Cancelando comunicação . . .\n")
-                    with open(f'Projeto 4/server/assets/log/log.txt', 'w') as f:
+                    with open(f'Projeto 5/server/assets/log/log.txt', 'w') as f:
                         f.write(logs)
                     com1.disable()
                     sys.exit("Comunicação encerrada")
@@ -135,6 +137,15 @@ def main():
                 if eop != 0x00000000.to_bytes(4, byteorder="big"):
                     print(f"O eop está no local errado! Por favor reenvie o pacote {numPacote}")
                     break
+
+                # Checando se o CRC está correto
+                crc1, crc2 = Crc16.calc(pacote[10:len(pacote) - 4]).to_bytes(2,byteorder='big')
+                crc_h8 = crc1.to_bytes(1,byteorder='big')
+                crc_h9 = crc2.to_bytes(1,byteorder='big')
+                if (h8.to_bytes(1, byteorder="big") != crc_h8) or (h9.to_bytes(1, byteorder="big") != crc_h9):
+                    print(f"O CRC está errado! Por favor reenvie o pacote {numPacote}")
+                
+
                 
                 print("Está tudo certo com a mensagem! Vamos enviar uma mensagem de confirmação.")
                 h0 = 4
@@ -156,12 +167,12 @@ def main():
                         data += payload_EOP[0:len(payload_EOP) - 4]
                         break
 
-        pathImageRx = "Projeto 4/server/assets/img/rxImage.png"
+        pathImageRx = "Projeto 5/server/assets/img/rxImage.png"
         f = open(pathImageRx, 'wb')
         f.write(data)
         f.close()
 
-        with open(f"Projeto 4/server/assets/log/log.txt", 'w') as f:
+        with open(f"Projeto 5/server/assets/log/log.txt", 'w') as f:
             f.write(logs)
         # * FECHANDO CLIENT
         print("-------------------------")

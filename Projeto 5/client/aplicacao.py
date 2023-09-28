@@ -62,7 +62,7 @@ def main():
                 com1.sendData(pacote)
                 (". . . Aguardando retorno para inicio de transmissão . . .")
                 logs += createLog(pacote, 'envio')
-                with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                with open(f'Projeto 5/client/assets/log/log.txt', 'w') as f:
                     f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
@@ -81,7 +81,7 @@ def main():
 
         #time.sleep(25)
 
-        path = "Projeto 4/client/assets/img/logo-insper.jpeg"  
+        path = "Projeto 5/client/assets/img/logo-insper.jpeg"  
         file = open(path, 'rb').read()
         payloads = [file[i:i + 114] for i in range(0, len(file), 114)]
         
@@ -126,7 +126,7 @@ def main():
                 logs += createLog(pacote, 'envio')
                 com1.sendData(pacote)
                 print("\nNenhuma resposta do servidor após 20 segundos!\n. . . Cancelando comunicação . . .")
-                with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                with open(f'Projeto 5/client/assets/log/log.txt', 'w') as f:
                     f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
@@ -150,7 +150,7 @@ def main():
                 elif confirmacao[0] == 5:
                     logs += createLog(confirmacao, 'recebimento')
                     print("Time-out de servidor registrado!\n. . . Cancelando comunicação . . .\n")
-                    with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                    with open(f'Projeto 5/client/assets/log/log.txt', 'w') as f:
                         f.write(logs)
                     com1.disable()
                     sys.exit("Comunicação encerrada")
@@ -166,7 +166,7 @@ def main():
                     h4 = numPacoteCorreto
                     cont = numPacoteCorreto - 1
 
-        with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+        with open(f'Projeto 5/client/assets/log/log.txt', 'w') as f:
             f.write(logs)
 
         # * FECHANDO CLIENT
