@@ -40,8 +40,6 @@ def main():
 
         pacote, lenPacote = com1.getDataHandshake(15)
 
-        print(pacote)
-
         logs += createLog(pacote, 'recebimento')
 
         pacote = list(pacote)
@@ -82,7 +80,7 @@ def main():
                 logs += createLog(pacote, 'envio')
                 com1.sendData(pacote)
                 print("\nPacote não recebido após 20 segundos!\n. . . Cancelando comunicação . . .\n")
-                with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                with open(f'Projeto 4/server/assets/log/log.txt', 'w') as f:
                     f.write(logs)
                 com1.disable()
                 sys.exit("Comunicação encerrada")
@@ -113,15 +111,10 @@ def main():
 
                 numPacoteRecebido = h4
 
-                print(numPacote)
-                print(h0)
-                print(pacote)
-                print()
-
                 if h0 == 5:
-                    logs += createLog(pacote, 'recebimento')
+                    #logs += createLog(pacote, 'recebimento')
                     print("Time-out de client registrado!\n. . . Cancelando comunicação . . .\n")
-                    with open(f'Projeto 4/client/assets/log/log.txt', 'w') as f:
+                    with open(f'Projeto 4/server/assets/log/log.txt', 'w') as f:
                         f.write(logs)
                     com1.disable()
                     sys.exit("Comunicação encerrada")
@@ -136,6 +129,7 @@ def main():
                     for i in confirmacao:
                         i = (i).to_bytes(1, byteorder="big")
                         responseCorrectMsg += i
+                    logs += createLog(confirmacao, 'envio')
                     com1.sendData(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"))
                     time.sleep(.5)
                     
@@ -146,7 +140,6 @@ def main():
                     print(f"O eop está no local errado! Por favor reenvie o pacote {numPacote}")
                     break
                 
-            
                 print("Está tudo certo com a mensagem! Vamos enviar uma mensagem de confirmação.")
                 h0 = 4
                 h7 = numPacote
@@ -159,7 +152,6 @@ def main():
                 logs += createLog(responseCorrectMsg + b'\x00' + 0x00000000.to_bytes(4, byteorder="big"), 'envio')
                 time.sleep(.5)
                 
-            
                 if numPacote == numPacoteRecebido:
                     numPacote += 1
                     data += payload_EOP[0:len(payload_EOP) - 4]                
@@ -167,7 +159,6 @@ def main():
                     if numPacote == h3 + 1:
                         data += payload_EOP[0:len(payload_EOP) - 4]
                         break
-
 
         pathImageRx = "Projeto 4/server/assets/img/rxImage.png"
         f = open(pathImageRx, 'wb')
