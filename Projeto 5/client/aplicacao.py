@@ -79,7 +79,7 @@ def main():
         # * ENVIO DOS PACOTES
         print("Agora vamos realizar o início do envio dos pacotes")
 
-        #time.sleep(25)
+        time.sleep(25)
 
         path = "Projeto 5/client/assets/img/logo-insper.jpeg"  
         file = open(path, 'rb').read()
