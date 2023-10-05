@@ -163,6 +163,41 @@ podem ocorrer em outras partes do byte de dados.
 
 '''
 
+## Stop Bit:
+'''
+    Um "Stop Bit" em uma comunicação UART é um ou mais bits que indicam o fim de um "frame" de transmissão 
+de dados. Após a transmissão dos bits de dados (ou bits de paridade, se estiverem presentes) em um 
+"frame," o "Stop Bit" é enviado para marcar o fim desse "frame" e permitir que o dispositivo receptor se 
+prepare para o próximo "frame."
+
+Qual é a função do "Stop Bit" na comunicação UART?
+    A função principal do "Stop Bit" na comunicação UART é indicar claramente o fim de um "frame" de 
+transmissão de dados. Como a comunicação UART é assíncrona, ou seja, não há um sinal de clock 
+compartilhado entre os dispositivos transmissor e receptor, o "Stop Bit" serve como um marcador que 
+permite ao dispositivo receptor determinar quando os bits de dados terminaram e quando o próximo "frame" 
+começará.
+
+Quantos "Stop Bits" podem ser usados na comunicação UART?
+    Na comunicação UART, é comum usar um ou dois "Stop Bits" após os bits de dados. A escolha entre um ou 
+dois "Stop Bits" é uma configuração que pode variar dependendo dos requisitos da aplicação e do hardware. 
+Um "Stop Bit" é suficiente na maioria dos casos, mas dois "Stop Bits" podem ser usados para fornecer uma 
+margem maior de tempo para sincronização em ambientes ruidosos ou em comunicações de longa distância.
+
+O que acontece se o "Stop Bit" não for recebido corretamente pelo dispositivo receptor?
+    Se o "Stop Bit" não for recebido corretamente pelo dispositivo receptor, isso pode causar erros de 
+sincronização na comunicação UART. O dispositivo receptor pode interpretar incorretamente os bits de dados 
+subsequentes como parte do "frame" atual, o que pode levar à corrupção dos dados e a erros na 
+interpretação.
+
+Qual é a relação entre o "Stop Bit" e a taxa de transmissão (Baud Rate) na comunicação UART?
+    O número de "Stop Bits" em um "frame" de transmissão afeta a duração do "frame" e, portanto, a taxa 
+efetiva de transmissão (Bit Rate) na comunicação UART. Mais "Stop Bits" resultam em "frames" mais longos, 
+reduzindo a taxa de transmissão efetiva, enquanto menos "Stop Bits" resultam em "frames" mais curtos, 
+aumentando a taxa de transmissão efetiva. Portanto, ao configurar a comunicação UART, a seleção do número 
+de "Stop Bits" deve ser feita levando em consideração a capacidade dos dispositivos de transmitir e 
+receber dados na taxa especificada.
+'''
+
 ## TX:
 '''
     "TX" é uma abreviação para "Transmit" (Transmissão). Na comunicação UART, "TX" refere-se 
@@ -304,7 +339,7 @@ condições do ambiente de comunicação e nos requisitos da aplicação.
 ## Buffer:
 '''
     Um buffer em uma comunicação UART é uma área de memória temporária usada para armazenar 
-dados queestão sendo transmitidos ou recebidos entre o transmissor e o receptor. Ele ajuda a 
+dados que estão sendo transmitidos ou recebidos entre o transmissor e o receptor. Ele ajuda a 
 gerenciar a diferença de velocidade entre a transmissão e a recepção de dados.
 
 Qual é a função principal de um buffer em uma transmissão UART?
@@ -433,6 +468,43 @@ transmissão em comunicações UART, mas não é suficiente para garantir a corr
 aplicações onde a detecção de erros é importante, mas a correção de erros não é crítica.
 '''
 
+## Datagrama:
+'''
+    Um "Datagrama" na comunicação UART é uma unidade de dados que contém informações a serem transmitidas 
+de um dispositivo para outro. Ele é composto por um ou mais "frames" (quadros) de transmissão, onde cada 
+"frame" é uma estrutura de dados que inclui os dados a serem transmitidos, bem como informações de 
+controle, como bits de início, bits de parada e, opcionalmente, bits de paridade.
+
+Qual é a finalidade de um "Datagrama" na comunicação UART?
+    A finalidade principal de um "Datagrama" na comunicação UART é fornecer uma unidade de dados 
+organizada para a transmissão e recepção entre dispositivos. Ele ajuda a encapsular os dados a serem 
+transmitidos, fornecendo informações de controle para que o dispositivo receptor possa interpretar 
+corretamente os dados. Além disso, o datagrama facilita a detecção de erros por meio de técnicas como o 
+uso de bits de paridade ou códigos de verificação de redundância cíclica (CRC).
+
+Quais são os componentes típicos de um "Datagrama" na comunicação UART?
+    Os componentes típicos de um "Datagrama" na comunicação UART incluem um ou mais frames de transmissão.
+
+Como os "Datagramas" são usados na comunicação UART?
+    Os "Datagramas" são usados na comunicação UART da seguinte maneira:
+-Os dados a serem transmitidos são encapsulados em um ou mais "frames" de transmissão, formando um 
+"Datagrama."
+-Cada "frame" é transmitido sequencialmente pela linha "TX" (transmissão) do dispositivo transmissor.
+-O dispositivo receptor monitora a linha "RX" (recepção) e recebe os "frames" do "Datagrama."
+-O dispositivo receptor interpreta cada "frame," extrai os dados e verifica a integridade dos dados 
+usando técnicas como bits de paridade ou códigos CRC.
+-Se os dados são recebidos com sucesso e a verificação de erro é bem-sucedida, o dispositivo receptor 
+processa os dados conforme necessário.
+
+Qual é a importância de um "Datagrama" na comunicação UART em termos de integridade e organização dos 
+dados transmitidos?
+    O "Datagrama" é importante na comunicação UART, pois fornece uma estrutura organizada e unificada para 
+a transmissão de dados. Ele ajuda a garantir que os dados sejam transmitidos e recebidos de maneira 
+ordenada e confiável, com informações de controle que permitem ao dispositivo receptor interpretar 
+corretamente os dados e verificar a integridade. Isso é fundamental para uma comunicação eficaz e sem 
+erros entre dispositivos UART.
+'''
+
 ## CRC:
 '''
     O CRC (Cyclic Redundancy Check) é um código de verificação de redundância cíclica usado na 
@@ -440,6 +512,10 @@ comunicação UART para detectar erros de transmissão de dados. Ele envolve a a
 verificação (CRC) aos dados transmitidos. O dispositivo receptor calcula um novo valor de CRC a 
 partir dos dados recebidos e compara esse valor com o CRC recebido. Se houver uma discrepância, 
 isso indica a presença de erros nos dados.
+    Se baseia em duvusao de polinômios:
+-Interpretar os dados como sendo coeficientes de um polinômio;
+-Cada código CRC tem um polinômio especial a ser usado como divisor;
+-O resto da divisão forma os bits de redundância do código.
 
 Qual é a finalidade do CRC na comunicação UART?
     A finalidade principal do CRC na comunicação UART é garantir a integridade dos dados 
@@ -448,7 +524,7 @@ elétrico, interferência ou corrupção de dados durante a transmissão. Se os 
 corrompidos durante a transmissão, o cálculo do CRC no receptor resultará em um valor diferente 
 do CRC recebido, indicando um erro.
 
-Como funciona o CRC na comunicação UART?
+Como funciona o CRC na comunicação UART (TEORIA)?
     O CRC na comunicação UART funciona da seguinte maneira:
 -O dispositivo transmissor calcula um valor de CRC com base nos dados a serem transmitidos. 
 Isso envolve a geração de um polinômio CRC e a realização de operações binárias nos bits de 
@@ -461,6 +537,22 @@ CRC calculado no receptor for diferente do CRC recebido, isso indica que ocorreu
 transmissão;
 -O dispositivo receptor pode solicitar uma retransmissão dos dados ou tomar outras medidas 
 corretivas, dependendo do protocolo de comunicação;
+
+Como funciona o CRC na comunicação UART (PRÁTICA)?
+-Dados como polinômios: Se os bits que queremos mandar forem 10110101, o polinômio correspondente é
+ x^7 + x^5 + x^4 + x^2 + x^0.
+ -Adotar um polinômio de CRC (existem vários): EXEMPLO --> CRC−4 = 𝑥^4+𝑥+1 (10011)
+ OBS: NORMALMENTE O BIT 1 DO INÍCIO NÃO É MOSTRADO:  1E2A5 ---> CRC E2A5
+-Para um polinômio de CRC de grau r, adicionar r zeros ao final dos dados, que é o mesmo que multiplicar 
+o polinômio dos dados por x^r: EXEMPLO --> Dados:10110101 ; Polinômio CRC:10011 ---> 101101010000
+-Efetuar a divisão polinomial, com uma mudança, (a aritmética da adição e subtração é substituída pelo 
+operador XOR: EXEMPLO1 --> 1011 - 1100 = 0111): EXEMPLO --> 101101010000 / 10011 = 10101010 com resto
+000000001110 (CRC = 1110) ; EXEMPLO2 --> 110101000 / 1001 = ? com resto 000000011 (CRC = 011)
+
+Como funciona o erro CRC na comunicação UART (PRÁTICA)?
+-Adicionar o CRC ao final dos dados: EXEMPLO --> 10110101 1110
+-Efetuar a divisão polinomial, com uma mudança: EXEMPLO --> 110101011 / 1001 = ? com resto
+000 (SEM ERRO)
 
 Qual é a vantagem de usar o CRC em uma comunicação UART?
     A principal vantagem de usar o CRC em uma comunicação UART é a detecção eficaz de erros de 
