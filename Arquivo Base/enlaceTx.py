@@ -7,6 +7,11 @@
 #  Camada de Enlace
 ####################################################
 
+'''O principal objetivo da classe TX é fornecer uma interface para a transmissão de dados pela camada de 
+enlace em uma comunicação UART. Ela permite que os dados sejam colocados em um buffer, controla a thread de 
+transmissão e fornece métodos para verificar o status da transmissão. Essa classe ajuda a gerenciar a 
+transmissão assíncrona de dados na camada de enlace da comunicação UART.'''
+
 # Importa pacote de tempo
 import time
 

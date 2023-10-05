@@ -7,6 +7,11 @@
 #  Camada de Enlace
 ####################################################
 
+'''A classe enlace age como uma interface intermediária que gerencia a comunicação entre as camadas de 
+enlace e física. Ela fornece métodos para iniciar, desativar, enviar e receber dados, simplificando a 
+interação entre as duas camadas. No contexto da transmissão digital UART, essa classe é uma parte importante 
+da pilha de comunicação que permite uma comunicação confiável e organizada entre dispositivos.'''
+
 # Importa pacote de tempo
 import time
 

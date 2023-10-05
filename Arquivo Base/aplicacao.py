@@ -5,6 +5,11 @@
 #Aplicação
 ####################################################
 
+'''Este código demonstra um exemplo simples de transmissão e recepção de dados por meio da biblioteca 
+enlace. Ele é útil para entender como configurar a comunicação serial e como usar a camada de enlace para 
+enviar e receber dados. Observe que os dados são transmitidos como bytes e que é importante que ambos os
+lados da comunicação estejam configurados com as mesmas configurações de comunicação, como baud rate, bits 
+de parada e outros parâmetros, para que a comunicação seja bem-sucedida.'''
 
 #esta é a camada superior, de aplicação do seu software de comunicação serial UART.
 #para acompanhar a execução e identificar erros, construa prints ao longo do código! 

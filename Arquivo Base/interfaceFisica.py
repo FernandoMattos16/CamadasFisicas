@@ -6,6 +6,10 @@
 #17/02/2018
 ####################################################
 
+'''Este código fornece uma camada de abstração para a comunicação UART, facilitando a configuração e o uso 
+da porta serial para troca de dados com dispositivos externos. É especialmente útil quando se lida com 
+dispositivos que requerem comunicação serial em formato hexadecimal ASCII.'''
+
 # Importa pacote de comunicação serial
 import serial
 

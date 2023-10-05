@@ -7,6 +7,11 @@
 #  Camada de Enlace
 ####################################################
 
+'''O principal objetivo da classe RX é fornecer uma interface para a recepção de dados pela camada de 
+enlace em uma comunicação UART. Ela permite controlar a recepção, ler os dados recebidos e gerenciar o 
+buffer de recepção. Essa classe ajuda a gerenciar a recepção assíncrona de dados na camada de enlace da 
+comunicação UART.'''
+
 # Importa pacote de tempo
 import time
 
