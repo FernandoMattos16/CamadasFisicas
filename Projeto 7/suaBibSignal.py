@@ -49,7 +49,7 @@ class signalMeu:
 
     def plotFFT(self, signal, fs):
         x,y = self.calcFFT(signal, fs)
-        plt.figure(figsize=(25,10))
+        plt.figure(figsize=(10,5))
         plt.plot(x, np.abs(y))
         plt.title(f'Gráfico de Fourier (tecla = {self.tecla})')
         plt.xlabel('Frequencias')

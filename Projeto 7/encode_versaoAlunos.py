@@ -54,7 +54,7 @@ def main():
     sd.wait()
 
     # Exibe gráficos
-    plt.figure(figsize=(25,10))
+    plt.figure(figsize=(10,5))
     plt.plot(encoder.t, encoder.signal[0], label=f"Senoide de f={encoder.DTMF[encoder.button][0]}")
     plt.plot(encoder.t, encoder.signal[1], label=f"Senoide de f={encoder.DTMF[encoder.button][1]}")
     plt.plot(encoder.t, som, label="Soma das senoides")

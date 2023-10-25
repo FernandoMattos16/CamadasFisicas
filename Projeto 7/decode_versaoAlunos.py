@@ -58,7 +58,7 @@ def main():
     x = np.linspace(0.0, duration, numAmostras)
   
     # plot do áudio gravado (dados) vs tempo! Não plote todos os pontos, pois verá apenas uma mancha (freq altas) . 
-    plt.figure(figsize=(25,10))
+    plt.figure(figsize=(10,5))
     plt.plot(x, dados)
     plt.title('Áudio Gravado')
     plt.xlabel('Tempo')
@@ -113,7 +113,7 @@ def main():
             signal.tecla = list_of_key[position]
 
     #print o valor tecla!!!
-    print(f"A tecla apertada foi a {list_of_key[position]}")
+    print(f"A tecla apertada foi a {signal.tecla}")
 
     #Se acertou, parabens! Voce construiu um sistema DTMF
 
