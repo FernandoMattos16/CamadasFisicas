@@ -85,14 +85,14 @@ def main():
     print(f"picos em x:{index_x}, quantidade:{len(index_x)}")
 
     #encontre na tabela duas frequencias proximas às frequencias de pico encontradas e descubra qual foi a tecla
-    uniqueTons = [1206, 1339, 1477, 1633, 697, 770, 852, 941]
-    menorDelta = 20
-    segundoMenorDelta = 20
+    frequences = [1206, 1339, 1477, 1633, 697, 770, 852, 941]
+    menorDelta = 73
+    segundoMenorDelta = 73
     tonCerto = 0
     segundoTonCerto = 0
 
     for peak in index_x:
-        for ton in uniqueTons:
+        for ton in frequences:
             delta = abs(peak - ton)
             if delta <= menorDelta:
                 menorDelta = delta

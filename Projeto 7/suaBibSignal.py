@@ -54,4 +54,5 @@ class signalMeu:
         plt.title(f'Gráfico de Fourier (tecla = {self.tecla})')
         plt.xlabel('Frequencias')
         plt.ylabel('Amplitude')
+        plt.xlim(0,1700)
         plt.show()
