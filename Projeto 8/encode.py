@@ -35,9 +35,9 @@ def main():
     audioNormalizado = encoder.normalizeSignal(audio[:,0])
     encoder.plot(audioNormalizado, 'normalizado')
     encoder.plotFFT(audio[:,0],freqDeAmostragem,'sem filtro')
-    
+
     #filtrando áudio
-    audioFiltrado = encoder.LPF(audioNormalizado, 4000)
+    audioFiltrado = encoder.FiltroGs(audioNormalizado)
     encoder.plot(audioFiltrado, 'filtrado')
     encoder.plotFFT(audioFiltrado, freqDeAmostragem, 'filtrado')
 

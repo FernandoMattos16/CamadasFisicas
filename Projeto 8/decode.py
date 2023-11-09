@@ -2,6 +2,7 @@
 from signal import Signal
 import sounddevice as sd
 import soundfile as sf
+import numpy as np
 
 
 
@@ -20,23 +21,27 @@ def main():
     sd.play(audio, decoder.fs)
     sd.wait()
 
+
+
     #demodulando áudio com transmissora de 14kHz
     print("Demodulando áudio\n")
-    audioDemodulado = decoder.signalPortadora*audio
+    audioDemodulado = audio*decoder.signalPortadora
     decoder.plot(audioDemodulado, 'demodulado')
     decoder.plotFFT(audioDemodulado, freqDeAmostragem, 'demodulado')
 
     #filtrando frequências superiores a 4kHz
     print("Filtrando frequências acima de 4kHz\n")
-    audioDemoFiltrado = decoder.LPF(audioDemodulado, 4000)
+    audioDemoFiltrado = decoder.FiltroGs(audioDemodulado)
     decoder.plotFFT(audioDemoFiltrado, freqDeAmostragem, 'demodulado e filtrado')
 
+    audioNormalizado = audioDemoFiltrado/(np.max(np.abs(audioDemoFiltrado)))
+
     print("Reproduzindo som do áudio demodulado e filtrado")
-    sd.play(audioDemoFiltrado, decoder.fs)
+    sd.play(audioNormalizado, decoder.fs)
     sd.wait()
 
     #criando arquivo de áudio
-    sf.write('decoder.wav', audioDemoFiltrado, decoder.fs)
+    sf.write('decoder.wav', audioNormalizado, decoder.fs)
 
 
 if __name__ == "__main__":

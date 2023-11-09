@@ -79,3 +79,15 @@ class Signal:
           amplitude = i
       audioNormalizado = audio/amplitude
       return audioNormalizado
+    
+    def FiltroGs(self, signal):
+        a = 0.005962
+        b = 0.005528
+        c = 1
+        d = -1.786
+        e = 0.7971
+        signalFiltrado = [signal[0], signal[1]]
+        for k in range (2, len(signal)):
+            filtro = -d*signalFiltrado[k-1] -e*signalFiltrado[k-2] + a*signal[k-1] + b*signal[k-2]
+            signalFiltrado.append(filtro)
+        return signalFiltrado
