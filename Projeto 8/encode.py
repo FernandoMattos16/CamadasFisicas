@@ -5,6 +5,8 @@ import sounddevice as sd
 import time
 import soundfile as sf
 
+
+
 def main():
 
     print("----- Inicializando encoder -----\n")
@@ -34,9 +36,7 @@ def main():
     encoder.plot(audioNormalizado, 'normalizado')
 
     #filtrando áudio
-    encoder.plotFFT(audio[:,0], freqDeAmostragem, 'sem filtro')
-
-    audioFiltrado = encoder.LPF(audio[:,0], 4000)
+    audioFiltrado = encoder.LPF(audioNormalizado, 4000)
     encoder.plot(audioFiltrado, 'filtrado')
     encoder.plotFFT(audioFiltrado, freqDeAmostragem, 'filtrado')
 
@@ -55,12 +55,8 @@ def main():
     sd.play(audioModulado, encoder.fs)
     sd.wait()
 
-    #filtrando, modulando e normalizando áudio
-    audioFiltroModulado = encoder.signalPortadora*audioFiltrado
-    audioFiltroModuNormalizado = encoder.normalizeSignal(audioFiltroModulado)
-
     #criando arquivo de áudio
-    sf.write('signalTransmition.wav', audioFiltroModuNormalizado, encoder.fs)
+    sf.write('encode.wav', audioModulado, encoder.fs)
 
 
 if __name__ == "__main__":

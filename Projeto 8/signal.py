@@ -1,11 +1,9 @@
 
 import numpy as np
-import sounddevice as sd
 import matplotlib.pyplot as plt
 from scipy.fftpack import fft
 from scipy import signal as window
 import scipy.signal as sg
-import sys
 
 
 
@@ -34,14 +32,13 @@ class Signal:
         plt.plot(x, np.abs(y))
         
         # Verificação da banda de frequência
-        plt.axvline(x=2500, ymin=0, ymax=4, color='r')
+        plt.axvline(x=4000, ymin=0, ymax=4, color='r')
         plt.axvline(x=10000, ymin=0, ymax=4, color='r')
         plt.axvline(x=18000, ymin=0, ymax=4, color='r')
 
         plt.title(f'Sinal de audio {title} - domínio da frequência')
         plt.xlabel('Frequencias')
         plt.ylabel('Amplitude')
-        plt.xlim(0,1700)
         plt.show()
     
     def plot(self, audio, title):
@@ -51,7 +48,6 @@ class Signal:
       plt.xlabel('Tempo')
       plt.ylabel('Amplitude')
       plt.show()
-
 
     # Converte intensidade em Db
     def todB(s):
@@ -75,11 +71,6 @@ class Signal:
         taps = sg.firwin(N, freqCorte/nyq_rate, window=('kaiser', beta))
         yFiltrado = sg.lfilter(taps, 1.0, signal)
         return yFiltrado
-    
-    # Parar o programa
-    def signal_handler(signal, frame):
-            print('You pressed Ctrl+C!')
-            sys.exit(0)
     
     def normalizeSignal(self, audio):
       amplitude = 0
